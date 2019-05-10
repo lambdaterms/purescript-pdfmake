@@ -16,10 +16,3 @@ table_ widths body = defaultContent { table = notNull t }
   where t = Table { body: body, widths: widths }
 
 nn = notNull
-
-setStyle
-  ∷ ∀ r
-  . String
-  → { style ∷ Nullable String | r }
-  → { style ∷ Nullable String | r }
-setStyle s = _ { style = nn $ s }

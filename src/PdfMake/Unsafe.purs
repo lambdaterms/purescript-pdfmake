@@ -12,7 +12,6 @@ type Path = String
 
 type DocDefinition = 
   { content ∷ Array Content
-  , styles ∷ Object Style
   , defaultStyle ∷ Nullable Style
   }
 
@@ -20,7 +19,9 @@ type Style =
   { fontSize ∷ Nullable Int
   , font ∷ Nullable String
   , margin ∷ Nullable (Array Int)
-  -- , bold
+  , alignment ∷ Nullable String
+  , bold ∷ Nullable Boolean
+  , color ∷ Nullable String
   }
 
 type Content = 
@@ -28,8 +29,14 @@ type Content =
   , text ∷ Nullable String
   , rowSpan ∷ Nullable Int
   , colSpan ∷ Nullable Int
-  , style ∷ Nullable String
   , layout ∷ Nullable String
+  -- flattened styles
+  , fontSize ∷ Nullable Int
+  , font ∷ Nullable String
+  , margin ∷ Nullable (Array Int)
+  , alignment ∷ Nullable String
+  , bold ∷ Nullable Boolean
+  , color ∷ Nullable String
   }
 
 newtype Table = Table
@@ -47,6 +54,9 @@ defaultStyle =
   { fontSize: null
   , font: null
   , margin: null
+  , alignment: null
+  , bold: null
+  , color: null
   }
 
 defaultContent ∷ Content
@@ -55,6 +65,12 @@ defaultContent =
   , text: null
   , rowSpan: null
   , colSpan: null
-  , style: null
   , layout: null
+  , fontSize: null
+  , font: null
+  , margin: null
+  , alignment: null
+  , bold: null
+  , color: null
   }
+

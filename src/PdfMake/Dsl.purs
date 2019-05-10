@@ -3,13 +3,86 @@ module PdfMake.Dsl where
 import Prelude
 
 import Data.Array (range, replicate, (!!), (:))
-import Data.Maybe (fromJust)
-import Data.Typelevel.Num (class Add, class LtEq, class Nat, D1, toInt, toInt')
+import Data.Maybe (Maybe(..), fromJust)
+import Data.Tuple (Tuple(..))
+import Data.Typelevel.Num (class Add, class LtEq, class Nat, class Succ, D1, D100, add, d1, succ, toInt, toInt')
 import Partial.Unsafe (unsafePartial)
 import Type.Proxy (Proxy(..))
 
 infixr 2 addRows as |||
 infixr 3 addCols as ++
+
+data Layout
+  = NoBorders
+  | HeaderLineOnly
+  | LightHorizontalLines
+
+showLayout ∷ Layout → String
+showLayout = case _ of
+  NoBorders → "noBorders"
+  HeaderLineOnly → "headerLineOnly"
+  LightHorizontalLines → "lightHorizontalLines"
+
+mkTable_ ∷ ∀ a w. Layout → TableBody a w → PrimTable a
+mkTable_ layout (TableBody body) = PrimTable
+  { body, layout, widths: Nothing }
+
+mkTable ∷
+  ∀ a w tup sum
+  . SumTuple tup sum
+  ⇒ LtEq sum D100
+  ⇒ NatTupleToIntArray tup
+  ⇒ TupleLength tup w
+  ⇒ Layout
+  → tup
+  → TableBody a w
+  → PrimTable a
+mkTable layout tup (TableBody body) = PrimTable
+  { body, layout, widths: Just $ natTupleToIntArray tup }
+
+class TupleLength tup len | tup → len where
+  tupleLength ∷ tup → len
+instance tupleLengthCons
+    ∷ ( TupleLength tail tailLen
+      , Succ tailLen len
+      )
+    ⇒ TupleLength (Tuple a tail) len
+  where
+  tupleLength (Tuple _ tail) = succ $ tupleLength tail
+else instance tupleLengthHead ∷ TupleLength a D1 where
+  tupleLength _ = d1
+
+class SumTuple tup res | tup → res where
+  sumTuple ∷ tup → res
+instance sumCons
+    ∷ ( Nat n
+      , SumTuple tail t
+      , Add n t res
+      )
+    ⇒ SumTuple (Tuple n tail) res
+  where
+  sumTuple (Tuple n tail) = add n $ sumTuple tail
+else instance sumHead ∷ Nat n ⇒ SumTuple n n where
+  sumTuple n = n
+
+class NatTupleToIntArray tup where
+  natTupleToIntArray ∷ tup → Array Int
+instance natTupleToIntArrayCons
+    ∷ ( Nat n
+      , NatTupleToIntArray tail
+      )
+    ⇒ NatTupleToIntArray (Tuple n tail)
+  where
+  natTupleToIntArray (Tuple n tail) = toInt n : natTupleToIntArray tail
+else instance natTupleToIntArrayHead ∷ Nat n ⇒ NatTupleToIntArray n where
+  natTupleToIntArray n = [toInt n]
+
+newtype PrimTable a = PrimTable 
+  { body ∷ Array (Array (PrimCell a))
+  , layout ∷ Layout
+  , widths ∷ Maybe (Array Int)
+  }
+
 
 -- AbstractCell
 
