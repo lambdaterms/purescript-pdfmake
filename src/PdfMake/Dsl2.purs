@@ -4,21 +4,31 @@ import Prelude
 
 import Data.Array (range, replicate, (!!), (:))
 import Data.Maybe (fromJust)
-import Data.Typelevel.Num (class Add, class LtEq, class Nat, D1, toInt')
+import Data.Typelevel.Num (class Add, class LtEq, class Nat, D1, toInt, toInt')
 import Partial.Unsafe (unsafePartial)
 import Type.Proxy (Proxy(..))
 
-newtype Cell a colspan rowspan = Cell { value ∷ a }
+infixr 2 addRows as |||
+infixr 3 addCols as ++
+
+newtype Cell a colSpan rowSpan = Cell { value ∷ a }
 
 data PrimCell a
   = Empty
   | PrimCell
     { value ∷ a
-    , rowspan ∷ Int
-    , colspan ∷ Int
+    , rowSpan ∷ Int
+    , colSpan ∷ Int
     }
 
 newtype TableH a width height = TableH (Array (Array (PrimCell a)))
+
+mkCell ∷ ∀ a colSpan rowSpan. colSpan → rowSpan → a → Cell a colSpan rowSpan
+mkCell _ _ value = Cell { value }
+
+mkEmpty ∷ ∀ a w h. Nat w ⇒ Nat h ⇒ w → h → TableH a w h
+mkEmpty w h = TableH $ replicate (toInt h) row
+  where row = replicate (toInt w) Empty
 
 fromCell ∷
   ∀ a w h
@@ -32,7 +42,7 @@ fromCell (Cell { value }) = TableH rows
   where
     w' = toInt' (Proxy ∷ Proxy w)
     h' = toInt' (Proxy ∷ Proxy h)
-    cell = PrimCell { value, colspan: w', rowspan: h' }
+    cell = PrimCell { value, colSpan: w', rowSpan: h' }
     fstRow = cell : replicate (w' - 1) Empty
     emptyRow = replicate w' Empty
     rows = fstRow : replicate (h' - 1) emptyRow
@@ -74,3 +84,9 @@ addTables ∷
 addTables (Table t1) (Table t2) = Table $ t1 <> t2
 
 newtype Table a width = Table (Array (Array (PrimCell a)))
+
+instance tableSemigroup ∷ Semigroup (Table a w) where
+  append = addTables
+
+instance tableMonoid ∷ Monoid (Table a w) where
+  mempty = Table []

@@ -8,41 +8,7 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Foreign.Object (fromFoldable)
 import PdfMake.Unsafe (Content, DocDefinition, Table(..), Style, createPdf)
-
-defaultStyle ∷ Style
-defaultStyle = 
-  { fontSize: null
-  , font: null
-  , margin: null
-  }
-
-defaultContent ∷ Content
-defaultContent = 
-  { table: null
-  , text: null
-  , rowSpan: null
-  , colSpan: null
-  , style: null
-  }
-
-text ∷ String → Content
-text s = defaultContent { text = notNull s }
-
-table ∷ Array (Array Content) → Content
-table = table_ null
-
-table_ ∷ Nullable (Array String) → Array (Array Content) → Content
-table_ widths body = defaultContent { table = notNull t }
-  where t = Table { body: body, widths: widths }
-
-nn = notNull
-
-setStyle
-  ∷ ∀ r
-  . String
-  → { style ∷ Nullable String | r }
-  → { style ∷ Nullable String | r }
-setStyle s = _ { style = nn $ s }
+import Test.Utils (defaultContent, text, setStyle, table, nn, defaultStyle)
 
 dd1 ∷ DocDefinition
 dd1 = 
