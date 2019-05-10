@@ -3,23 +3,7 @@ module Test.Utils where
 import Prelude
 
 import Data.Nullable (Nullable, notNull, null)
-import PdfMake.Unsafe (Content, Style, Table(..))
-
-defaultStyle ∷ Style
-defaultStyle = 
-  { fontSize: null
-  , font: null
-  , margin: null
-  }
-
-defaultContent ∷ Content
-defaultContent = 
-  { table: null
-  , text: null
-  , rowSpan: null
-  , colSpan: null
-  , style: null
-  }
+import PdfMake.Unsafe (Content, Style, Table(..), defaultContent)
 
 text ∷ String → Content
 text s = defaultContent { text = notNull s }

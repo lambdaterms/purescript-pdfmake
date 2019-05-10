@@ -7,8 +7,8 @@ import Data.Tuple.Nested ((/\))
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Foreign.Object (fromFoldable)
-import PdfMake.Unsafe (Content, DocDefinition, Table(..), Style, createPdf)
-import Test.Utils (defaultContent, text, setStyle, table, nn, defaultStyle)
+import PdfMake.Unsafe (Content, DocDefinition, Style, Table(..), createPdf, defaultContent, defaultStyle)
+import Test.Utils (text, setStyle, table, nn)
 
 dd1 ∷ DocDefinition
 dd1 = 

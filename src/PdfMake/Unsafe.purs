@@ -3,7 +3,7 @@ module PdfMake.Unsafe where
 import Prelude
 
 import Data.Function.Uncurried (Fn2, runFn2)
-import Data.Nullable (Nullable)
+import Data.Nullable (Nullable, null)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Foreign.Object (Object)
@@ -29,6 +29,7 @@ type Content =
   , rowSpan ∷ Nullable Int
   , colSpan ∷ Nullable Int
   , style ∷ Nullable String
+  , layout ∷ Nullable String
   }
 
 newtype Table = Table
@@ -41,3 +42,19 @@ createPdf dd path = fromEffectFnAff $ runFn2 _createPdf dd path
 
 foreign import _createPdf ∷ Fn2 DocDefinition Path (EffectFnAff Unit)
 
+defaultStyle ∷ Style
+defaultStyle = 
+  { fontSize: null
+  , font: null
+  , margin: null
+  }
+
+defaultContent ∷ Content
+defaultContent = 
+  { table: null
+  , text: null
+  , rowSpan: null
+  , colSpan: null
+  , style: null
+  , layout: null
+  }
